@@ -27,7 +27,8 @@ file_list () {
   # ファイル名::::::行番号::::::変更後のソース
   # 切り出す為、ソース内で仕様しない文字列を間にはさんだ。
   # 生成内容はdiff_linesを参照
-  DIFF=`git --no-pager diff --no-ext-diff --cached -U1000000 | diff_lines | grep -E "^[^\"].*\:\:\:\:\:[0-9]+\:\:\:\:\:[\+]"`
+  # add 後の場合は　 --cachedをいれる
+  DIFF=`git --no-pager diff --no-ext-diff -U1000000 | diff_lines | grep -E "^[^\"].*\:\:\:\:\:[0-9]+\:\:\:\:\:[\+]"`
 
   echo "$DIFF" | while read
   do
@@ -55,11 +56,11 @@ file_list () {
       ;;
       app/controllers*)
         # 取得したい内容
-        #  class AssetsApiController < BaseController
+        #  class AbcdefgController < BaseController
         # 取得に省いている内容
-        #  authorize_resource :setting, :class => "AndroidSecureSettingGlobalSetting", :parent => false
-        #  class InvalidParameterError < StandardError; end
-        #  category_class = category.try(:class) || AssetCategory
+        #  authorize_resource :setting, :class => "Abcdefg", :parent => false
+        #  class Abcdefg < StandardError; end
+        #  category_class = abcdefg.try(:class) || Abcdefg
         def=`sed -n "1,${arr[1]}p" ${arr[0]} | grep -ni "class [A-Z]" | grep -v " :class" | grep -v "end" | tail -n 1`
         # クラス名のみを取得
         class_name=`echo "$def" | sed -e "s/^.*class \(.*\) <.*$/\1/"`
@@ -122,10 +123,9 @@ file_list () {
     esac
   done
 }
-# list=`file_list | sort | uniq | sed 's/\\n/'"$LF"'/g'`
-list=`grep -E "" -rl  app/models* | sort | uniq | sed 's/\\n/'"$LF"'/g'`
+list=`file_list | sort | uniq | sed 's/\\n/'"$LF"'/g'`
 # 該当ファイル名一覧を日本語化するための処理を実行
-bundle exec rails runner "InfluenceRange::Name.get('$list')"
+echo "${list}"
 
 
 
